@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart - Interactive E-Commerce</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div>
+            <a href="index.html">Home</a>
+            <a href="cart.html">Cart</a>
+            <a href="checkout.html">Checkout</a>
+        </div>
+        <div id="cartCount">Cart (0)</div>
+    </nav>
+
+    <h1>Your Shopping Cart</h1>
+    <a href="index.html" style="display: inline-block; margin-bottom: 20px;">← Back to Shop</a>
+
+    <!-- Dynamic cart items with qty (JS populates) -->
+    <div id="cartItems"></div>
+    
+    <h2 id="totalPrice">Total: $0</h2>
+
+    <!-- Checkout button (disabled if empty via JS if needed) -->
+    <a href="checkout.html">
+        <button id="checkoutBtn">Proceed to Checkout</button>
+    </a>
+
+    <script src="javascript/script.js"></script>
+</body>
+</html>
+
