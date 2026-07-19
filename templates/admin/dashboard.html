@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | ELSF</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="icon" href="/asset/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/asset/favicon.svg">
+  <link rel="stylesheet" href="/admin/assets/admin.css">
+</head>
+<body class="admin-body">
+  <!--
+    ELSF Owner Dashboard.
+    Rendered by app.py's admin_dashboard() view, which passes in three lists:
+    `updates`, `stories` and `adverts` (read from asset/data/content.json).
+    Each Jinja for-loop below renders one row per item; the small forms inside
+    each row POST to the add/delete/toggle routes in app.py.
+    (Note: avoid writing literal Jinja tags in comments — Jinja still parses them.)
+  -->
+  <header class="admin-header">
+    <div class="admin-header-inner">
+      <div class="admin-brand"><img src="/admin/assets/log.png" alt="ELSF"><span>Owner Dashboard</span></div>
+      <div>
+        <!-- The public site lives in asset/; open its home page in a new tab. -->
+        <a href="/asset/index.html" class="admin-link" target="_blank">View site <i class="bi bi-box-arrow-up-right"></i></a>
+        <a href="/admin/logout" class="admin-link">Log out</a>
+      </div>
+    </div>
+  </header>
+  <main class="admin-main">
+
+    <!-- Flash messages (success/error) set by the routes in app.py. -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <section class="admin-panel admin-panel-hero">
+      <h2><i class="bi bi-speedometer2"></i> Welcome back</h2>
+      <p class="admin-hint">Manage the latest updates, stories and adverts from one place. Changes are saved to the website instantly.</p>
+    </section>
+
+    <nav class="admin-tabs">
+      <a href="#updates">Updates</a>
+      <a href="#stories">Stories</a>
+      <a href="#adverts">Adverts</a>
+    </nav>
+
+    <!-- ===================== UPDATES ===================== -->
+    <section class="admin-panel" id="updates">
+      <h2><i class="bi bi-megaphone"></i> Updates</h2>
+      <p class="admin-hint">Short dated announcements shown in the top bar, on the home page and on the Updates page.</p>
+      <form method="post" action="/admin/updates/add" class="admin-form" enctype="multipart/form-data">
+        <div class="admin-grid">
+          <label>Title<input type="text" name="title" required></label>
+          <label>Date<input type="date" name="date"></label>
+          <label class="wide">Link (optional)<input type="text" name="link" placeholder="neld.html or https://…"></label>
+          <label>Highlight image<input type="file" name="image" accept="image/*"></label>
+          <label>…or highlight image URL<input type="text" name="image_url" placeholder="image/…"></label>
+          <label class="wide">Other images (select several)<input type="file" name="images" accept="image/*" multiple></label>
+          <label class="wide">…or other image URLs (one per line)<textarea name="images_url" rows="2" placeholder="image/one.jpg&#10;image/two.jpg"></textarea></label>
+          <label class="wide">Body<textarea name="body" rows="2" required></textarea></label>
+        </div>
+        <button type="submit" class="btn-brand">Add update</button>
+      </form>
+      <table class="admin-table">
+        <thead><tr><th>Date</th><th>Title</th><th></th></tr></thead>
+        <tbody>
+          {% for u in updates %}
+          <tr>
+            <td>{{ u.date }}</td>
+            <td>{{ u.title }}</td>
+            <td><form method="post" action="/admin/updates/{{ u.id }}/delete" onsubmit="return confirm('Delete this update?')"><button class="btn-danger">Delete</button></form></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="3">No updates yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ===================== STORIES ===================== -->
+    <section class="admin-panel" id="stories">
+      <h2><i class="bi bi-file-text"></i> Stories</h2>
+      <p class="admin-hint">Longer articles shown on the Updates page and under NELD/PPELD (use a slug that starts with "neld" or "ppeld" to show it there).</p>
+      <form method="post" action="/admin/stories/add" class="admin-form" enctype="multipart/form-data">
+        <div class="admin-grid">
+          <label>Title<input type="text" name="title" required></label>
+          <label>Slug<input type="text" name="slug" placeholder="e.g. neld-2025"></label>
+          <label>Category / label<input type="text" name="category" placeholder="Edition · 2025"></label>
+          <label>Date<input type="date" name="date"></label>
+          <label>Highlight image<input type="file" name="image" accept="image/*"></label>
+          <label>…or highlight image URL<input type="text" name="image_url" placeholder="image/…"></label>
+          <label class="wide">Other images (select several)<input type="file" name="images" accept="image/*" multiple></label>
+          <label class="wide">…or other image URLs (one per line)<textarea name="images_url" rows="2" placeholder="image/one.jpg&#10;image/two.jpg"></textarea></label>
+          <label class="wide">Summary<textarea name="summary" rows="2"></textarea></label>
+          <label class="wide">Full body<textarea name="body" rows="5"></textarea></label>
+        </div>
+        <button type="submit" class="btn-brand">Add story</button>
+      </form>
+      <table class="admin-table">
+        <thead><tr><th>Date</th><th>Title</th><th>Slug</th><th></th></tr></thead>
+        <tbody>
+          {% for s in stories %}
+          <tr>
+            <td>{{ s.date }}</td>
+            <td>{{ s.title }}</td>
+            <td><a href="/asset/story.html?slug={{ s.slug }}" target="_blank">{{ s.slug }}</a></td>
+            <td><form method="post" action="/admin/stories/{{ s.id }}/delete" onsubmit="return confirm('Delete this story?')"><button class="btn-danger">Delete</button></form></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4">No stories yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ===================== ADVERTS ===================== -->
+    <section class="admin-panel" id="adverts">
+      <h2><i class="bi bi-badge-ad"></i> Adverts</h2>
+      <p class="admin-hint">Image-only banners shown on the home page, 3 to a row. Each advert is just one banner image with an optional link — no text. Toggle "active" to show or hide without deleting.</p>
+      <form method="post" action="/admin/adverts/add" class="admin-form" enctype="multipart/form-data">
+        <div class="admin-grid">
+          <label>Advert image (banner)<input type="file" name="image" accept="image/*"></label>
+          <label>…or image URL<input type="text" name="image_url" placeholder="image/…"></label>
+          <label class="wide">Link (optional)<input type="text" name="link" placeholder="membership.html or https://…"></label>
+        </div>
+        <p class="admin-hint">Use a wide banner image with a 16:9 shape (e.g. 1200×675px) so all tiles line up.</p>
+        <button type="submit" class="btn-brand">Add advert</button>
+      </form>
+      <table class="admin-table">
+        <thead><tr><th>Advert</th><th>Status</th><th></th><th></th></tr></thead>
+        <tbody>
+          {% for a in adverts %}
+          <tr>
+            <td>{% if a.image %}<img src="/asset/{{ a.image }}" alt="advert" style="height:44px;border-radius:6px;display:block">{% else %}<span class="admin-hint">No image</span>{% endif %}</td>
+            <td>
+              {% if a.active %}<span class="pill pill-on">Active</span>{% else %}<span class="pill pill-off">Hidden</span>{% endif %}
+            </td>
+            <td><form method="post" action="/admin/adverts/{{ a.id }}/toggle"><button class="btn-ghost">{% if a.active %}Hide{% else %}Show{% endif %}</button></form></td>
+            <td><form method="post" action="/admin/adverts/{{ a.id }}/delete" onsubmit="return confirm('Delete this advert?')"><button class="btn-danger">Delete</button></form></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4">No adverts yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+</body>
+</html>
